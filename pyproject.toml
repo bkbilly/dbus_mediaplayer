@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools~=69.2.0", "wheel~=0.43.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name              = "dbus_mediaplayer"
+version           = "2024.7.1"
+description       = "Currently playng media using DBus"
+readme            = "README.md"
+keywords          = ["lnxlink"]
+requires-python   = ">=3.7.0"
+authors     = [
+    {name="Alexander Frenzel", email="alex@relatedworks.com"},
+    {name="bkbilly", email="bkbilly@hotmail.com"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Unix",
+]
+dependencies = [
+    "dasbus>=1.7",
+    "PyGObject>=3.44.0"
+]
+
+
+[project.urls]
+"Source Code" = "https://github.com/bkbilly/dbus_mediaplayer"
+
+[tool.setuptools.packages.find]
+include = ["dbus_mediaplayer*"]
+
+[project.scripts]
+dbus-mediaplayer = "dbus_mediaplayer.__main__:main"
