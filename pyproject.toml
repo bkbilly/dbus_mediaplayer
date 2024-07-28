@@ -10,7 +10,6 @@ readme            = "README.md"
 keywords          = ["lnxlink"]
 requires-python   = ">=3.7.0"
 authors     = [
-    {name="Alexander Frenzel", email="alex@relatedworks.com"},
     {name="bkbilly", email="bkbilly@hotmail.com"}
 ]
 classifiers = [
