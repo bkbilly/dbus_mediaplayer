@@ -38,10 +38,10 @@ class DBusMediaPlayers:
                     position = proxy.Get("org.mpris.MediaPlayer2.Player", "Position").get_int64()
                     players.append({
                         "dbus_uri": service,
-                        "title": metadata.get("xesam:title"),
-                        "artist": ", ".join(metadata.get("xesam:artist")),
-                        "album": metadata.get("xesam:album"),
-                        "arturl": metadata.get("mpris:artUrl"),
+                        "title": metadata.get("xesam:title", ""),
+                        "artist": ", ".join(metadata.get("xesam:artist", "")),
+                        "album": metadata.get("xesam:album", ""),
+                        "arturl": metadata.get("mpris:artUrl", ""),
                         "duration": round(metadata.get("mpris:length", 0) / 1000 / 1000),
                         "position": round(position / 1000 / 1000),
                         "status": playback_status,
