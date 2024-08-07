@@ -35,7 +35,10 @@ class DBusMediaPlayers:
                 playback_status = proxy.Get("org.mpris.MediaPlayer2.Player", "PlaybackStatus").get_string()
                 if playback_status != "Stopped":
                     metadata = dict(proxy.Get("org.mpris.MediaPlayer2.Player", "Metadata"))
-                    position = proxy.Get("org.mpris.MediaPlayer2.Player", "Position").get_int64()
+                    try:
+                        position = proxy.Get("org.mpris.MediaPlayer2.Player", "Position").get_int64()
+                    except:
+                        position = 0
                     players.append({
                         "dbus_uri": service,
                         "title": metadata.get("xesam:title", ""),
@@ -66,14 +69,24 @@ class DBusMediaPlayers:
 
     def watch_changes(self):
         """Subscribes to the DBus to get any change"""
-        watch_proxy = self.bus.get_proxy(
-            service_name=None,
-            object_path="/org/mpris/MediaPlayer2",
-        )
-        watch_proxy.PropertiesChanged.connect(self.dbus_callback)
+        try:
+            watch_proxy = self.bus.get_proxy(
+                service_name=None,
+                object_path="/org/mpris/MediaPlayer2",
+            )
+            watch_proxy.PropertiesChanged.connect(self.dbus_callback)
 
-        loop = EventLoop()
-        threading.Thread(target=loop.run, daemon=True).start()
+            loop = EventLoop()
+            threading.Thread(target=loop.run, daemon=True).start()
+        except Exception as err:
+            logger.debug("Can't connect to event trigger: %s", err)
+            threading.Thread(target=self.watch_changes_bg, daemon=True).start()
+
+    def watch_changes_bg(self):
+        while True:
+            time.sleep(0.5)
+            self.dbus_callback(None, None, None)
+
 
     def dbus_callback(self, iface, prop_changed, prop_invalidated):
         """Callback method of watch_changes"""
