@@ -16,7 +16,7 @@ The `dbus-mediaplayer` library empowers Python applications to interact with med
 ## Requirements
 
 * Python 3.7 or later
-* `dasdbus` library
+* `jeepney` library
 
 ## Installation
 

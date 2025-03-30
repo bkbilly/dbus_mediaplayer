@@ -9,5 +9,5 @@ def main():
         description="Gets a list of Media Players from DBus")
     args = parser.parse_args()
 
-    players = DBusMediaPlayers()
+    players = DBusMediaPlayers(oneshot=True)
     print(json.dumps(players.players, indent=2))
