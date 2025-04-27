@@ -1,6 +1,7 @@
 import json
 import time
 import logging
+import traceback
 import threading
 from jeepney import DBusAddress, MessageType, new_method_call
 from jeepney.io.blocking import open_dbus_connection, Proxy
@@ -100,17 +101,21 @@ class DBusMediaPlayers:
                         self.conn.send(get_prop_msg)
                         reply = self.conn.receive()
                         try:
-                            position = reply.body[0][1]
+                            position = round(reply.body[0][1] / 1000 / 1000)
                         except:
                             position = 0
+                        try:
+                            duration = round(metadata.get("mpris:length", ["", 0])[1] / 1000 / 1000)
+                        except:
+                            duration = 0
                         players.append({
                             "dbus_uri": service,
                             "title": metadata.get("xesam:title", ["", ""])[1],
                             "artist": ", ".join(metadata.get("xesam:artist", ["", ""])[1]),
                             "album": metadata.get("xesam:album", ["", ""])[1],
                             "arturl": metadata.get("mpris:artUrl", ["", ""])[1],
-                            "duration": round(metadata.get("mpris:length", ["", 0])[1] / 1000 / 1000),
-                            "position": round(position / 1000 / 1000),
+                            "duration": duration,
+                            "position": position,
                             "status": playback_status,
                         })
 
@@ -130,10 +135,13 @@ class DBusMediaPlayers:
     def watch_changes_bg(self):
         while True:
             msg = self.conn.receive()
-            self.players = self.get_players()
-            if self.players != self.prev_send:
-                self.callback(self.players)
-                self.prev_send = self.players
+            try:
+                self.players = self.get_players()
+                if self.players != self.prev_send:
+                    self.callback(self.players)
+                    self.prev_send = self.players
+            except Exception as err:
+                logger.error("DBus MediaPlayer: %s, %s", err, traceback.format_exc())
 
     def control_media(self, action, player=None):
         """Sends a custom message call for controlling the media"""
@@ -158,4 +166,4 @@ if __name__ == "__main__":
     dbusplayer = DBusMediaPlayers(mycallback)
     while True:
         time.sleep(1.1)
-        dbusplayer.control_media("PlayPause")
+        # dbusplayer.control_media("PlayPause")

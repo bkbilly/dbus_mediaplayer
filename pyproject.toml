@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name              = "dbus_mediaplayer"
-version           = "2025.3.0"
+version           = "2025.4.0"
 description       = "Currently playng media using DBus"
 readme            = "README.md"
 keywords          = ["lnxlink"]
