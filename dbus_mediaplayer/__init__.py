@@ -68,6 +68,19 @@ class DBusMediaPlayers:
                     signature="ss",  # Two strings (interface, property)
                     body=(
                         "org.mpris.MediaPlayer2.Player",  # Interface
+                        "Volume"  # Property name
+                    )
+                )
+                self.conn.send(get_prop_msg)
+                reply = self.conn.receive()
+                volume_status = reply.body[0][1]
+
+                get_prop_msg = new_method_call(
+                    remote_obj=media_addr,
+                    method="Get",
+                    signature="ss",  # Two strings (interface, property)
+                    body=(
+                        "org.mpris.MediaPlayer2.Player",  # Interface
                         "PlaybackStatus"  # Property name
                     )
                 )
@@ -110,6 +123,7 @@ class DBusMediaPlayers:
                             duration = 0
                         players.append({
                             "dbus_uri": service,
+                            "trackid": metadata.get("mpris:trackid", ["", ""])[1],
                             "title": metadata.get("xesam:title", ["", ""])[1],
                             "artist": ", ".join(metadata.get("xesam:artist", ["", ""])[1]),
                             "album": metadata.get("xesam:album", ["", ""])[1],
@@ -117,6 +131,7 @@ class DBusMediaPlayers:
                             "duration": duration,
                             "position": position,
                             "status": playback_status,
+                            "volume": volume_status,
                         })
 
         # Order the players so that the most important to be first
@@ -146,15 +161,53 @@ class DBusMediaPlayers:
     def control_media(self, action, player=None):
         """Sends a custom message call for controlling the media"""
         if player is None:
-            player = self.players[0]["dbus_uri"]
+            player = self.players[0]
 
         msg = new_method_call(
             remote_obj=DBusAddress(
                 object_path="/org/mpris/MediaPlayer2",
-                bus_name=player,
+                bus_name=player["dbus_uri"],
                 interface="org.mpris.MediaPlayer2.Player",
             ),
             method=action
+        )
+        self.conn.send(msg)
+
+    def control_volume(self, volume, player=None):
+        """Sets the volume of the media"""
+        if player is None:
+            player = self.players[0]
+
+        msg = new_method_call(
+            remote_obj=DBusAddress(
+                object_path="/org/mpris/MediaPlayer2",
+                bus_name=player["dbus_uri"],
+                interface="org.freedesktop.DBus.Properties",
+            ),
+            method="Set",
+            signature="ssv",  # Interface name, property name, variant value
+            body=(
+                "org.mpris.MediaPlayer2.Player",  # Interface
+                "Volume",  # Property name
+                ("d", volume),  # Volume as a variant of type 'double'
+            )
+        )
+        self.conn.send(msg)
+
+    def control_setposition(self, position, player=None):
+        """Sets the volume of the media"""
+        if player is None:
+            player = self.players[0]
+
+        msg = new_method_call(
+            remote_obj=DBusAddress(
+                object_path="/org/mpris/MediaPlayer2",
+                bus_name=player["dbus_uri"],
+                interface="org.mpris.MediaPlayer2.Player",
+            ),
+            method="SetPosition",
+            signature="ox",  # Object path and int64
+            body=(player["trackid"], position * 1000 * 1000)
         )
         self.conn.send(msg)
 

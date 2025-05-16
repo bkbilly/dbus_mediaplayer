@@ -6,11 +6,12 @@
 
 The `dbus-mediaplayer` library empowers Python applications to interact with media players on your system through the D-Bus communication protocol. This enables you to retrieve metadata (like song titles and artists), control playback (play, pause, next, etc.), and potentially even access features specific to certain media players.
 
+
 ## Key Features
 
 * **Media Player Discovery:** Enumerate available media players on your system.
 * **Metadata Access:** Retrieve current song information (title, artist, album, etc.).
-* **Playback Control:** Play, pause, skip tracks.
+* **Playback Control:** Play, Pause, Skip tracks, Volume, Position.
 * **Real-time Updates:** Utilizes callback functions to provide instant notifications of media player state changes, ensuring your application stays up-to-date.
 
 ## Requirements
@@ -26,13 +27,11 @@ Install the library using pip:
 pip install dbus-mediaplayer
 ```
 
+
 ## Usage
 
 This library offers two primary usage approaches:
 
-### Command-Line Interaction (Optional)
-
-If you prefer a quick way to view information or control playback, you can potentially execute the dbus-mediaplayer script directly. For more extensive programmatic control, I would recommend using the library within your Python code.
 
 ### Programmatic Control
 
@@ -56,12 +55,39 @@ while True:
     time.sleep(1)
 ```
 
+
+### Command-Line Interaction (Optional)
+
+If you prefer a quick way to view information or control playback, you can potentially execute the dbus-mediaplayer script directly. For more extensive programmatic control, I would recommend using the library within your Python code.
+The script supports the following optional arguments for media control:
+
+#### Status (Default):
+If no argument is provided, the script defaults to retrieving media player information.
+```bash
+dbus-mediaplayer get-info
+```
+
+#### Volume Control:
+You can set the volume level (between 0.0 and 1.0).
+```bash
+dbus-mediaplayer control --volume 0.5   # Sets volume to 50%
+```
+
+#### Set Media Position:
+Adjust the playback position in seconds.
+```bash
+dbus-mediaplayer control --position 120  # Sets position to 2 minutes
+```
+
+#### Playback Control:
+Perform media control actions: Play, Pause, PlayPause, Stop, Next, Previous.
+``` bash
+dbus-mediaplayer command Pause  # Pauses playback
+dbus-mediaplayer command Play   # Plays playback
+```
+
+This flexible command-line approach offers a straightforward way to control media playback directly from the terminal.
+
+
 ## Inspiration
 This library was inspired by the MPRIS2 library, which utilizes the `dbus-python` library. However, `dbus-mediaplayer` aims to offer a more widely deployable solution, removing reliance on external dependencies.
-
-## Future Features
-While dbus-mediaplayer provides a solid foundation for interacting with media players, there's room for growth. Here are some features it is missing and could be implemented in future development:
-
- * **Seek Position Control:** Allow users to set the playback position within a media track.
- * **Volume Control:** Implement methods for adjusting media player volume. Note that volume control support may vary across different media players and platforms.
- * **Playback Capabilities:** Provide methods to determine if a media player supports specific playback actions like next, previous, stop, and seek. This will allow users to tailor their interactions based on player capabilities.
